@@ -68,7 +68,7 @@ def matrix2text(matrix):
 class AES:
 	def __init__(self, master_key):
 		self.change_key(master_key)
-
+# tao expansion key 44word - 176bbyte 
 	def change_key(self, master_key):
 		self.round_keys = text2matrix(master_key)
 		# print self.round_keys
@@ -91,22 +91,22 @@ class AES:
 					self.round_keys[i].append(byte)
 
 		# print self.round key
-
+# thuc hien encrypt
 	def encrypt(self, plaintex):
 		self.plain_state = text2matrix(plaintex)
 
-		self.__add_round_key(self.plain_state, self.round_keys[:4])
+		self.__add_round_key(self.plain_state, self.round_keys[:4])	#round 0
 
-		for i in range(1,10):
+		for i in range(1,10):						#thuc hien 9 round encrypt gom 4 stage
 			self.__round_encrypt(self.plain_state, self.round_keys[4*i:4*(i+1)])
 
-		self.__sub_bytes(self.plain_state)
+		self.__sub_bytes(self.plain_state)				#thuc hien round 10 gom 3 stage			
 		self.__shift_rows(self.plain_state)
 		self.__add_round_key(self.plain_state,self.round_keys[40:])
 
 		return matrix2text(self.plain_state)
 
-	def decrypt(self, ciphertext):
+	def decrypt(self, ciphertext):						#thuc hien decrypt theo thu tu ngulailai
 		self.cipher_state = text2matrix(ciphertext)
 
 		self.__add_round_key(self.cipher_state, self.round_keys[40:])
@@ -120,10 +120,10 @@ class AES:
 
 		return matrix2text(self.cipher_state)
 
-	def __add_round_key(self, s, k):
+	def __add_round_key(self, s, k):					#dinh nghia add round key
 		for i in range(4):
 			for j in range(4):
-				s[i][j] ^= k[i][j]
+				s[i][j] ^= k[i][j]				#thuc hien xor tung byte voi round keykey
 
 	def __round_encrypt(self, state_matrix, key_matrix):
 		self.__sub_bytes(state_matrix)
@@ -137,7 +137,7 @@ class AES:
 		self.__inv_shift_rows(state_matrix)
 		self.__inv_sub_bytes(state_matrix)
 
-	def __sub_bytes(self, s):
+	def __sub_bytes(self, s):						# sub byte bien doi byte to byte thong qua s-
 		for i in range(4):
 			for j in range(4):
 				s[i][j] = Sbox[s[i][j]]
@@ -147,7 +147,7 @@ class AES:
 			for j in range(4):
 				s[i][j] = InvSbox[s[i][j]]
 
-	def __shift_rows(self, s):
+	def __shift_rows(self, s):						# thuc hien shift row
 		s[0][1], s[1][1], s[2][1], s[3][1] = s[1][1], s[2][1], s[3][1], s[0][1]
 		s[0][2], s[1][2], s[2][2], s[3][2] = s[2][2], s[3][2], s[0][2], s[1][2]
 		s[0][3], s[1][3], s[2][3], s[3][3] = s[3][3], s[0][3], s[1][3], s[2][3]
